@@ -42,8 +42,8 @@
 (type_definition) @type
 
 ; --- state (LAST: a declaration is state only when no function pattern took it) ------------------
-(declaration (init_declarator declarator: (identifier) @name)) @binding ; @priority
-(declaration declarator: (identifier) @name) @binding ; @priority
+(declaration (init_declarator declarator: (identifier) @name) .) @binding ; @priority
+(declaration declarator: (identifier) @name .) @binding ; @priority
 
 ; --- imports ------------------------------------------------------------------------------------
 ; capture.import.merge contiguous: adjacent imports merge per CONTIGUOUS RUN - the engine default

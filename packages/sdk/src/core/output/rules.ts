@@ -19,7 +19,10 @@ function handleLine(rule: Rule): string {
   const h = rule.handleData;
   if (h === undefined) return "no handle (classification only)";
   if ("map" in h) {
-    return "level map: " + h.map.join(" / ");
+    return (
+      "level map: " +
+      h.map.map((entry) => (typeof entry === "string" ? entry : entry.level)).join(" / ")
+    );
   }
   if ("choices" in h) {
     // one tier per option label: the levels inline, the messages after them

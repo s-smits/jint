@@ -95,6 +95,32 @@ describe("capture() e2e — the exported sdk surface", () => {
     );
   });
 
+  test.each(["a.ts", "a.tsx"])(
+    "%s: a declaration of several variables is one element, named by its first",
+    async (file) => {
+      const dir = setup(`multi-declarator-${file}`, {
+        [file]:
+          "export const a = 1, b = 2;\nfunction f() {\n  let c = 1, d = 2;\n  for (let e = 1, g = 0; ; e++) if (g === e + c + d) return;\n}\n",
+      });
+      const elements = await capture(join(dir, file));
+      const named = (kind: string) => elements.filter((e) => e.kind === kind).map((e) => e.name);
+      expect(named("binding")).toContain("a");
+      expect(named("binding")).not.toContain("b");
+      expect(named("function")).toContain("f");
+    },
+  );
+
+  test.each([
+    ["a.go", "package a\n\nvar a, b = 1, 2\n"],
+    ["a.c", "int a, b;\n"],
+    ["a.cpp", "int a, b;\n"],
+    ["a.php", "<?php\nconst A = 1, B = 2;\n"],
+  ])("%s: a declaration of several names is one binding", async (file, source) => {
+    const dir = setup(`multi-name-${file}`, { [file]: source });
+    const elements = await capture(join(dir, file));
+    expect(elements.filter((e) => e.kind === "binding")).toHaveLength(1);
+  });
+
   test("a dir with files no grammar claims succeeds: elements from the claimable, one event per skip", async () => {
     const dir = setup("sweep", {
       "a.md": DOC,

@@ -93,7 +93,8 @@ describe("rule domains: what a run needs", () => {
       "a.ts": "function alpha() {}\n",
       "jint.config.json": JSON.stringify({ rules: { use: ["is_comment_narration"] } }),
     });
-    const r = await runCli(["run", "a.ts"], { cwd: dir });
+    // a throwaway key: the run must get past setup to find there is nothing to measure
+    const r = await runCli(["run", "a.ts"], { cwd: dir, env: { OPENAI_API_KEY: "test" } });
     expect(r.code).toBe(4);
     expect(r.stderr).toContain("rule 'is_comment_narration' targets comments: no such element");
     expect(r.stderr).toContain("nothing was measured");

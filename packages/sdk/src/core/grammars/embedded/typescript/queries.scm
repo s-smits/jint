@@ -59,12 +59,12 @@
 
 ; Callable initializers keep the function capture (old refineCallableInitializers); any other
 ; lexical/variable declaration is a binding. Earlier patterns win (see header).
-(lexical_declaration (variable_declarator name: (identifier) @name value: (arrow_function))) @function ; @priority
-(lexical_declaration (variable_declarator name: (identifier) @name value: (function_expression))) @function ; @priority
-(variable_declaration (variable_declarator name: (identifier) @name value: (arrow_function))) @function ; @priority
-(variable_declaration (variable_declarator name: (identifier) @name value: (function_expression))) @function ; @priority
-(lexical_declaration (variable_declarator name: (identifier) @name)) @binding ; @priority
-(variable_declaration (variable_declarator name: (identifier) @name)) @binding ; @priority
+(lexical_declaration . (variable_declarator name: (identifier) @name value: (arrow_function))) @function ; @priority
+(lexical_declaration . (variable_declarator name: (identifier) @name value: (function_expression))) @function ; @priority
+(variable_declaration . (variable_declarator name: (identifier) @name value: (arrow_function))) @function ; @priority
+(variable_declaration . (variable_declarator name: (identifier) @name value: (function_expression))) @function ; @priority
+(lexical_declaration . (variable_declarator name: (identifier) @name)) @binding ; @priority
+(variable_declaration . (variable_declarator name: (identifier) @name)) @binding ; @priority
 
 ; --- declarations: types ---------------------------------------------------------------------
 ; @class is the named-class capture: class-like units judged as classes. Interfaces, aliases and
@@ -106,12 +106,12 @@
 (export_statement declaration: (interface_declaration name: (type_identifier) @name)) @type ; @priority
 (export_statement declaration: (type_alias_declaration name: (type_identifier) @name)) @type ; @priority
 (export_statement declaration: (enum_declaration name: (identifier) @name)) @type ; @priority
-(export_statement declaration: (lexical_declaration (variable_declarator name: (identifier) @name value: (arrow_function)))) @function ; @priority
-(export_statement declaration: (lexical_declaration (variable_declarator name: (identifier) @name value: (function_expression)))) @function ; @priority
-(export_statement declaration: (variable_declaration (variable_declarator name: (identifier) @name value: (arrow_function)))) @function ; @priority
-(export_statement declaration: (variable_declaration (variable_declarator name: (identifier) @name value: (function_expression)))) @function ; @priority
-(export_statement declaration: (lexical_declaration (variable_declarator name: (identifier) @name))) @binding ; @priority
-(export_statement declaration: (variable_declaration (variable_declarator name: (identifier) @name))) @binding ; @priority
+(export_statement declaration: (lexical_declaration . (variable_declarator name: (identifier) @name value: (arrow_function)))) @function ; @priority
+(export_statement declaration: (lexical_declaration . (variable_declarator name: (identifier) @name value: (function_expression)))) @function ; @priority
+(export_statement declaration: (variable_declaration . (variable_declarator name: (identifier) @name value: (arrow_function)))) @function ; @priority
+(export_statement declaration: (variable_declaration . (variable_declarator name: (identifier) @name value: (function_expression)))) @function ; @priority
+(export_statement declaration: (lexical_declaration . (variable_declarator name: (identifier) @name))) @binding ; @priority
+(export_statement declaration: (variable_declaration . (variable_declarator name: (identifier) @name))) @binding ; @priority
 
 ; --- top-level statements: the statement group ---------------------------------------------
 ; STATEMENT GROUP (this grammar's own capture): executable statements at program level that no

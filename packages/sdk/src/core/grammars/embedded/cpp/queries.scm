@@ -58,8 +58,8 @@
 (field_declaration (function_declarator)) @method ; @priority
 
 ; --- state ---------------------------------------------------------------------------------------
-(declaration (init_declarator declarator: (identifier) @name)) @binding ; @priority
-(declaration declarator: (identifier) @name) @binding ; @priority
+(declaration (init_declarator declarator: (identifier) @name) .) @binding ; @priority
+(declaration declarator: (identifier) @name .) @binding ; @priority
 
 ; --- imports --------------------------------------------------------------------------------------
 ; capture.import.merge contiguous: adjacent imports merge per CONTIGUOUS RUN - the engine default
