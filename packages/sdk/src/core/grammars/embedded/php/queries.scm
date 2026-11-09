@@ -42,7 +42,7 @@
 
 ; --- state ---------------------------------------------------------------------------------------
 (assignment_expression left: (variable_name (name) @name)) @binding ; @priority
-(const_declaration (const_element (name) @name)) @binding
+(const_declaration (const_element (name) @name) .) @binding
 
 ; --- imports --------------------------------------------------------------------------------------
 (namespace_use_declaration) @import
