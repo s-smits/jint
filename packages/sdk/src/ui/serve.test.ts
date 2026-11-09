@@ -131,36 +131,49 @@ describe("startUi", () => {
   });
 });
 
-describe("host option precedence and custom-host round trip", () => {
-  test("host option beats JINT_UI_HOST; the bind follows the option", async () => {
-    process.env.JINT_UI_HOST = "127.0.0.3";
-    try {
-      const ui = await startUi({ distDir: tempDir("jint-ui-dist-"), host: "127.0.0.2" });
+// macOS aliases only 127.0.0.1 on lo0, so a bind to any other loopback address fails there.
+function canBindSecondLoopback(): boolean {
+  try {
+    Bun.serve({ port: 0, hostname: "127.0.0.2", fetch: () => new Response() }).stop(true);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+describe.skipIf(!canBindSecondLoopback())(
+  "host option precedence and custom-host round trip",
+  () => {
+    test("host option beats JINT_UI_HOST; the bind follows the option", async () => {
+      process.env.JINT_UI_HOST = "127.0.0.3";
       try {
-        expect(ui.url).toContain("127.0.0.2:");
-        expect(ui.url).not.toContain("127.0.0.3");
+        const ui = await startUi({ distDir: tempDir("jint-ui-dist-"), host: "127.0.0.2" });
+        try {
+          expect(ui.url).toContain("127.0.0.2:");
+          expect(ui.url).not.toContain("127.0.0.3");
+        } finally {
+          ui.close();
+        }
+      } finally {
+        delete process.env.JINT_UI_HOST;
+      }
+    });
+
+    test("a custom bound host round-trips: its own Host is 200, a foreign Host is 403", async () => {
+      const dist = tempDir("jint-ui-dist-");
+      writeFileSync(join(dist, "index.html"), "<html><body>jint ui</body></html>");
+      const ui = await startUi({ distDir: dist, host: "127.0.0.2" });
+      try {
+        const good = await fetch(new URL("/", ui.url));
+        expect(good.status).toBe(200);
+        const evil = await fetch(new URL("/", ui.url), { headers: { host: "evil.example" } });
+        expect(evil.status).toBe(403);
       } finally {
         ui.close();
       }
-    } finally {
-      delete process.env.JINT_UI_HOST;
-    }
-  });
-
-  test("a custom bound host round-trips: its own Host is 200, a foreign Host is 403", async () => {
-    const dist = tempDir("jint-ui-dist-");
-    writeFileSync(join(dist, "index.html"), "<html><body>jint ui</body></html>");
-    const ui = await startUi({ distDir: dist, host: "127.0.0.2" });
-    try {
-      const good = await fetch(new URL("/", ui.url));
-      expect(good.status).toBe(200);
-      const evil = await fetch(new URL("/", ui.url), { headers: { host: "evil.example" } });
-      expect(evil.status).toBe(403);
-    } finally {
-      ui.close();
-    }
-  });
-});
+    });
+  },
+);
 
 describe("hostAllowed", () => {
   test("localhost variants pass, port suffix optional", () => {
